@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import mean_squared_error, r2_score
 import streamlit as st
-import plotly_express as px
+import plotly.express as px
 import pandas as pd
 import numpy as np
 
