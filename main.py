@@ -5,7 +5,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import mean_squared_error, r2_score
 import streamlit as st
+
 import plotly.express as px
+import plotly.graph_objects as go
+
 import pandas as pd
 import numpy as np
 
@@ -21,7 +24,7 @@ st.sidebar.subheader("Opciones")
 archivo = st.sidebar.file_uploader(label="Escoja un archivo", type=['csv','xlsx','xls','json'])
 
 if archivo != None:
-    try:
+    #try:
         if archivo.type == 'application/json':
             df = pd.read_json(archivo)
         elif archivo.type == 'text/csv':
@@ -79,8 +82,55 @@ if archivo != None:
                     st.write("Prediccion para: "+predecir)
                     st.write(regresion.predict([[float(predecir)]])[0])
 
+        elif algoritmo == "Polinomial":
+            columnas = list(df.columns)
+            columnX = st.sidebar.selectbox(label="Seleccione X", options=columnas)
+            columnY = st.sidebar.selectbox(label="Seleccione Y", options=columnas)
+            grado = st.sidebar.text_input("Grado de la regresion",placeholder="Ingrese un numero")
+
+            if columnX != columnY and grado != "":
+                st.subheader("Grafico de Regresion Polinomial")
+
+                x = np.asarray(df[columnX]).reshape(-1, 1)
+                y = df[columnY]
+
+                polinomio = PolynomialFeatures(degree=int(grado))
+                polinomio.fit(x)
+                Xpolinomio = polinomio.transform(x)
+
+                regresion = LinearRegression(fit_intercept=False)
+                regresion.fit(Xpolinomio, y)
+                y_pred = regresion.predict(Xpolinomio)
+                
+                fig = px.scatter(df, x = columnX, y= columnY, opacity=0.65)
+                fig.add_traces(go.Scatter(x=x.squeeze(), y=y_pred,name="grado: "+grado))
+                st.plotly_chart(fig)
+
+                operaciones = st.multiselect("Escoja las operaciones que desea ver", options=["R^2","RMSE"])
+                
+                if "R^2" in operaciones:
+                    r2 = r2_score(y, y_pred)
+                    st.write("R^2")
+                    st.write(r2)
+
+                
+                if "RMSE" in operaciones:
+                    rmse = np.sqrt(mean_squared_error(y, y_pred))
+                    st.write("Error Cuadratico")
+                    st.write(rmse)
+                
+                predecir = st.sidebar.text_input("Valor a predecir",placeholder="Ingrese un numero")
+                
+                if predecir != "":
+                    Xmin = float(predecir)
+                    Xmax = float(predecir)
+                    Xnuevo = np.linspace(Xmin, Xmax, 1)
+                    Xnuevo = Xnuevo[:, np.newaxis]
+                    Xtrans = polinomio.fit_transform(Xnuevo)
+                    st.write("Prediccion para: "+predecir)
+                    st.write(regresion.predict(Xtrans)[0])
         
-    except:
-        st.write("Error al leer el archivo")
+    #except:
+    #   st.write("Error al leer el archivo")
 
 
