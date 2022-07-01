@@ -24,7 +24,7 @@ st.sidebar.subheader("Opciones")
 archivo = st.sidebar.file_uploader(label="Escoja un archivo", type=['csv','xlsx','xls','json'])
 
 if archivo != None:
-    #try:
+    try:
         if archivo.type == 'application/json':
             df = pd.read_json(archivo)
         elif archivo.type == 'text/csv':
@@ -92,22 +92,25 @@ if archivo != None:
                 st.subheader("Grafico de Regresion Polinomial")
 
                 x = np.asarray(df[columnX]).reshape(-1, 1)
+                Xrango = np.linspace(x.min(), x.max(), 100).reshape(-1, 1)
                 y = df[columnY]
 
                 polinomio = PolynomialFeatures(degree=int(grado))
                 polinomio.fit(x)
                 Xpolinomio = polinomio.transform(x)
+                Xrangopoli = polinomio.transform(Xrango)
 
                 regresion = LinearRegression(fit_intercept=False)
                 regresion.fit(Xpolinomio, y)
-                y_pred = regresion.predict(Xpolinomio)
+                y_pred = regresion.predict(Xrangopoli)
                 
                 fig = px.scatter(df, x = columnX, y= columnY, opacity=0.65)
-                fig.add_traces(go.Scatter(x=x.squeeze(), y=y_pred,name="grado: "+grado))
+                fig.add_traces(go.Scatter(x=Xrango.squeeze(), y=y_pred,name="grado: "+grado))
                 st.plotly_chart(fig)
 
                 operaciones = st.multiselect("Escoja las operaciones que desea ver", options=["R^2","RMSE"])
                 
+                y_pred = regresion.predict(Xpolinomio)
                 if "R^2" in operaciones:
                     r2 = r2_score(y, y_pred)
                     st.write("R^2")
@@ -130,7 +133,7 @@ if archivo != None:
                     st.write("Prediccion para: "+predecir)
                     st.write(regresion.predict(Xtrans)[0])
         
-    #except:
-    #   st.write("Error al leer el archivo")
+    except:
+       st.write("Error al leer el archivo")
 
 
