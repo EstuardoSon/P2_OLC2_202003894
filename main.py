@@ -1,9 +1,13 @@
 from distutils.command.upload import upload
 from logging import PlaceHolder
+from unittest import result
 from nbformat import write
+from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 import streamlit as st
 
 import plotly.express as px
@@ -133,6 +137,22 @@ if archivo != None:
                     st.write("Prediccion para: "+predecir)
                     st.write(regresion.predict(Xtrans)[0])
         
+        elif algoritmo == 'Clas. Gauss':
+            columnas = list(df.columns)
+            columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
+            columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            if len(columnsX) != 0 and not(columnY in columnsX):
+                x = df[columnsX]
+                y = df[columnY]
+                gauss = GaussianNB()
+                gauss.fit( x , y)
+                valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
+
+                if valorPred != "":
+                    valoresPred = np.array(valorPred.split(","))
+                    floatarray = valoresPred.astype(float)
+                    st.write("Valor de prediccion")
+                    st.write(gauss.predict([floatarray])[0])
     except:
        st.write("Error al leer el archivo")
 
