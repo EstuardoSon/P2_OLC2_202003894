@@ -2,5 +2,6 @@ sklearn
 streamlit
 dtreeviz
 plotly
+graphviz
 pandas
 numpy
