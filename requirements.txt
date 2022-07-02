@@ -4,4 +4,3 @@ dtreeviz
 plotly
 pandas
 numpy
-base64
