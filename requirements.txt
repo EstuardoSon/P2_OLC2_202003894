@@ -5,3 +5,10 @@ dtreeviz
 plotly
 pandas
 numpy
+iniconfig 
+colour 
+tomli 
+py 
+pluggy 
+atomicwrites
+pytest
