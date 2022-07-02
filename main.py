@@ -4,7 +4,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
 import streamlit as st
 import graphviz
 
@@ -13,7 +14,6 @@ import plotly.graph_objects as go
 
 import pandas as pd
 import numpy as np
-import base64
 
 global df
 
@@ -180,6 +180,32 @@ if archivo != None:
                     floatarray = preprocessing.LabelEncoder().fit_transform(valoresPred)
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
+
+        elif algoritmo == 'Redes Neuronales':
+            columnas = list(df.columns)
+            columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
+            columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            
+            if len(columnsX) != 0 and not(columnY in columnsX):
+                x = df[columnsX]
+                y = df[columnY]
+
+                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                leY = preprocessing.LabelEncoder()
+                y = leY.fit_transform(y)
+                neural = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+                neural.fit(x_trans, y)
+                
+                valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4|5,6,7,8")
+
+                if valorPred != "":
+                    arreglo = valorPred.split("|")
+                    matriz = []
+                    for i in range(len(arreglo)):
+                        matriz.append(preprocessing.LabelEncoder().fit_transform(arreglo[i].split(",")))
+                    st.write("Valor de prediccion")
+                    st.write(leY.inverse_transform(neural.predict(matriz))[0])
+
 
     except Exception as e:
        st.write("Error al leer el archivo")
