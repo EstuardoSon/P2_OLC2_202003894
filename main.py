@@ -183,8 +183,9 @@ if archivo != None:
                     plot_tree(arbol,feature_names=columnsX,filled=True)
                     viz = dtreeviz(arbol, x_trans, y,target_name=columnY,feature_names=columnsX)
                     svg_write(viz.svg())
-                except:
+                except Exception as e:
                     st.write("No fue posible generar la grafica")
+                    st.write(e)
 
                 valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
 
