@@ -1,23 +1,30 @@
-from distutils.command.upload import upload
-from logging import PlaceHolder
-from unittest import result
-from nbformat import write
 from sklearn import preprocessing
+from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 import streamlit as st
+from dtreeviz.trees import dtreeviz
 
 import plotly.express as px
 import plotly.graph_objects as go
 
 import pandas as pd
 import numpy as np
+import base64
 
 global df
-        
+
+def svg_write(svg, center=True):
+    b64 = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
+
+    justificar = "center" if center else "left"
+    css = f'<p style="text-align:center; display: flex; justify-content: {justificar};">'
+    html = f'{css}<img src="data:image/svg+xml;base64,{b64}"/>'
+
+    st.write(html, unsafe_allow_html=True)
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -28,7 +35,7 @@ st.sidebar.subheader("Opciones")
 archivo = st.sidebar.file_uploader(label="Escoja un archivo", type=['csv','xlsx','xls','json'])
 
 if archivo != None:
-    try:
+    #try:
         if archivo.type == 'application/json':
             df = pd.read_json(archivo)
         elif archivo.type == 'text/csv':
@@ -144,16 +151,50 @@ if archivo != None:
             if len(columnsX) != 0 and not(columnY in columnsX):
                 x = df[columnsX]
                 y = df[columnY]
+
+                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                leY = preprocessing.LabelEncoder()
+                y = leY.fit_transform(y)
                 gauss = GaussianNB()
-                gauss.fit( x , y)
+                gauss.fit( x_trans , y)
                 valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
 
                 if valorPred != "":
                     valoresPred = np.array(valorPred.split(","))
-                    floatarray = valoresPred.astype(float)
+                    floatarray = preprocessing.LabelEncoder().fit_transform(valoresPred)
                     st.write("Valor de prediccion")
-                    st.write(gauss.predict([floatarray])[0])
-    except:
-       st.write("Error al leer el archivo")
+                    st.write(leY.inverse_transform(gauss.predict([floatarray]))[0])
+
+        elif algoritmo == 'Clas. Arboles':
+            columnas = list(df.columns)
+            columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
+            columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            if len(columnsX) != 0 and not(columnY in columnsX):
+                x = df[columnsX]
+                y = df[columnY]
+                arbol=DecisionTreeClassifier()
+
+                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                leY = preprocessing.LabelEncoder()
+                y = leY.fit_transform(y)
+                arbol.fit(x_trans,y)
+
+                try:
+                    plot_tree(arbol,feature_names=columnsX,filled=True)
+                    viz = dtreeviz(arbol, x_trans, y,target_name=columnY,feature_names=columnsX)
+                    svg_write(viz.svg())
+                except:
+                    st.write("No fue posible generar la grafica")
+
+                valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
+
+                if valorPred != "":
+                    valoresPred = np.array(valorPred.split(","))
+                    floatarray = preprocessing.LabelEncoder().fit_transform(valoresPred)
+                    st.write("Valor de prediccion")
+                    st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
+
+    #except:
+     #  st.write("Error al leer el archivo")
 
 
