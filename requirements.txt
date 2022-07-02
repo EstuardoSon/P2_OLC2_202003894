@@ -78,7 +78,6 @@ Pympler==1.0.1
 pyparsing==3.0.9
 pyrsistent==0.18.1
 pytest==7.1.2
-python-dateutil==2.8.2
 pywin32==304
 pywinpty==2.0.5
 pyzmq==23.2.0
