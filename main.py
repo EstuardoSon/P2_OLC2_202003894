@@ -182,7 +182,7 @@ if archivo != None:
                 try:
                     plot_tree(arbol,feature_names=columnsX,filled=True)
                     viz = dtreeviz(arbol, x_trans, y,target_name=columnY,feature_names=columnsX)
-                    svg_write(viz.svg())
+                    svg_write(viz._repr_svg_())
                 except Exception as e:
                     st.write("No fue posible generar la grafica")
                     st.write(e)
