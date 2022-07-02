@@ -1,4 +1,4 @@
-from sklearn import preprocessing
+from sklearn import preprocessing, tree
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
@@ -6,7 +6,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 import streamlit as st
-from dtreeviz.trees import dtreeviz
+import graphviz
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -16,15 +16,6 @@ import numpy as np
 import base64
 
 global df
-
-def svg_write(svg, center=True):
-    b64 = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
-
-    justificar = "center" if center else "left"
-    css = f'<p style="text-align:center; display: flex; justify-content: {justificar};">'
-    html = f'{css}<img src="data:image/svg+xml;base64,{b64}"/>'
-
-    st.write(html, unsafe_allow_html=True)
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -179,13 +170,8 @@ if archivo != None:
                 y = leY.fit_transform(y)
                 arbol.fit(x_trans,y)
 
-                try:
-                    plot_tree(arbol,feature_names=columnsX,filled=True)
-                    viz = dtreeviz(arbol, x_trans, y,target_name=columnY,feature_names=columnsX)
-                    svg_write(viz._repr_svg_())
-                except Exception as e:
-                    st.write("No fue posible generar la grafica")
-                    st.write(e)
+                dot_data = tree.export_graphviz(arbol, out_file=None)   
+                st.graphviz_chart(dot_data)
 
                 valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
 
