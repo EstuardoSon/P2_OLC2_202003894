@@ -35,7 +35,7 @@ st.sidebar.subheader("Opciones")
 archivo = st.sidebar.file_uploader(label="Escoja un archivo", type=['csv','xlsx','xls','json'])
 
 if archivo != None:
-    #try:
+    try:
         if archivo.type == 'application/json':
             df = pd.read_json(archivo)
         elif archivo.type == 'text/csv':
@@ -195,7 +195,8 @@ if archivo != None:
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
 
-    #except:
-     #  st.write("Error al leer el archivo")
+    except Exception as e:
+       st.write("Error al leer el archivo")
+       st.write(e)
 
 
