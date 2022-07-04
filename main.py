@@ -229,7 +229,7 @@ if archivo != None:
                         fila = arreglo[i].split(",")
                         filacod = []
                         for j in range(len(fila)):
-                            filacod.append(encriptados[i].transform([fila[i]])[0])
+                            filacod.append(encriptados[j].transform([fila[j]])[0])
                         matriz.append(filacod)
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(neural.predict(matriz))[0])
