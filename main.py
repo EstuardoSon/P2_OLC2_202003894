@@ -143,7 +143,13 @@ if archivo != None:
                 x = df[columnsX]
                 y = df[columnY]
 
-                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                x_trans = x.copy()
+                encriptados = []
+                for columna in columnsX:
+                    leX = preprocessing.LabelEncoder()
+                    x_trans[columna] = leX.fit_transform(x_trans[columna])
+                    encriptados.append(leX)
+
                 leY = preprocessing.LabelEncoder()
                 y = leY.fit_transform(y)
                 gauss = GaussianNB()
@@ -152,7 +158,10 @@ if archivo != None:
 
                 if valorPred != "":
                     valoresPred = np.array(valorPred.split(","))
-                    floatarray = preprocessing.LabelEncoder().fit_transform(valoresPred)
+                    valoresPred = np.array(valorPred.split(","))
+                    floatarray = []
+                    for i in range(len(encriptados)):
+                        floatarray.append(encriptados[i].transform([str(valoresPred[i])])[0])
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(gauss.predict([floatarray]))[0])
 
@@ -165,7 +174,13 @@ if archivo != None:
                 y = df[columnY]
                 arbol=DecisionTreeClassifier()
 
-                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                x_trans = x.copy()
+                encriptados = []
+                for columna in columnsX:
+                    leX = preprocessing.LabelEncoder()
+                    x_trans[columna] = leX.fit_transform(x_trans[columna])
+                    encriptados.append(leX)
+
                 leY = preprocessing.LabelEncoder()
                 y = leY.fit_transform(y)
                 arbol.fit(x_trans,y)
@@ -177,7 +192,10 @@ if archivo != None:
 
                 if valorPred != "":
                     valoresPred = np.array(valorPred.split(","))
-                    floatarray = preprocessing.LabelEncoder().fit_transform(valoresPred)
+                    floatarray = []
+                    for i in range(len(encriptados)):
+                        floatarray.append(encriptados[i].transform([str(valoresPred[i])])[0])
+
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
 
@@ -190,7 +208,13 @@ if archivo != None:
                 x = df[columnsX]
                 y = df[columnY]
 
-                x_trans = x.apply(preprocessing.LabelEncoder().fit_transform)
+                x_trans = x.copy()
+                encriptados = []
+                for columna in columnsX:
+                    leX = preprocessing.LabelEncoder()
+                    x_trans[columna] = leX.fit_transform(x_trans[columna])
+                    encriptados.append(leX)
+
                 leY = preprocessing.LabelEncoder()
                 y = leY.fit_transform(y)
                 neural = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
@@ -202,7 +226,11 @@ if archivo != None:
                     arreglo = valorPred.split("|")
                     matriz = []
                     for i in range(len(arreglo)):
-                        matriz.append(preprocessing.LabelEncoder().fit_transform(arreglo[i].split(",")))
+                        fila = arreglo[i].split(",")
+                        filacod = []
+                        for j in range(len(fila)):
+                            filacod.append(encriptados[i].transform([fila[i]])[0])
+                        matriz.append(filacod)
                     st.write("Valor de prediccion")
                     st.write(leY.inverse_transform(neural.predict(matriz))[0])
 
