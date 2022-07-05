@@ -1,3 +1,4 @@
+from pyparsing import col
 from sklearn import preprocessing, tree
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
@@ -139,36 +140,57 @@ if archivo != None:
             columnas = list(df.columns)
             columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
             columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            columnasNum = list(df.select_dtypes(["int","float","boolean"]).columns)
+
             if len(columnsX) != 0 and not(columnY in columnsX):
                 x = df[columnsX]
                 y = df[columnY]
 
                 x_trans = x.copy()
+                print(columnasNum)
                 encriptados = []
+
                 for columna in columnsX:
-                    leX = preprocessing.LabelEncoder()
-                    x_trans[columna] = leX.fit_transform(x_trans[columna])
-                    encriptados.append(leX)
+                    if columna in columnasNum:
+                        leX = preprocessing.LabelEncoder()
+                        x_trans[columna] = leX.fit_transform(x_trans[columna])
+                        encriptados.append(leX)
+                    else:
+                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
-                y = leY.fit_transform(y)
+                if not(columnY in columnasNum):
+                    y = leY.fit_transform(y)
+
                 gauss = GaussianNB()
                 gauss.fit( x_trans , y)
                 valorPred = st.sidebar.text_input(label="Ingrese valores:", placeholder="eje: 0,1,3,4")
 
                 if valorPred != "":
                     valoresPred = np.array(valorPred.split(","))
-                    valoresPred = np.array(valorPred.split(","))
                     floatarray = []
-                    for i in range(len(encriptados)):
-                        floatarray.append(encriptados[i].transform([str(valoresPred[i])])[0])
+                    contador = 0
+
+                    for i in range(len(columnsX)):
+                        if not(columnsX[i] in columnasNum):
+                            floatarray.append(encriptados[contador].transform([str(valoresPred[i])])[0])
+                            contador = contador + 1
+                        else:
+                            floatarray.append(float(valoresPred[i]))
+
                     st.write("Valor de prediccion")
-                    st.write(leY.inverse_transform(gauss.predict([floatarray]))[0])
+                    print(floatarray)
+                    if not(columnY in columnasNum):
+                        st.write(leY.inverse_transform(gauss.predict([floatarray]))[0])
+                    else:
+                        st.write(gauss.predict([floatarray])[0])
 
         elif algoritmo == 'Clas. Arboles':
             columnas = list(df.columns)
             columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
             columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            columnasNum = list(df.select_dtypes(["int","float","boolean"]).columns)
+
             if len(columnsX) != 0 and not(columnY in columnsX):
                 x = df[columnsX]
                 y = df[columnY]
@@ -176,13 +198,19 @@ if archivo != None:
 
                 x_trans = x.copy()
                 encriptados = []
+
                 for columna in columnsX:
-                    leX = preprocessing.LabelEncoder()
-                    x_trans[columna] = leX.fit_transform(x_trans[columna])
-                    encriptados.append(leX)
+                    if columna in columnasNum:
+                        leX = preprocessing.LabelEncoder()
+                        x_trans[columna] = leX.fit_transform(x_trans[columna])
+                        encriptados.append(leX)
+                    else:
+                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
-                y = leY.fit_transform(y)
+                if not(columnY in columnasNum):
+                    y = leY.fit_transform(y)
+
                 arbol.fit(x_trans,y)
 
                 dot_data = tree.export_graphviz(arbol, out_file=None)   
@@ -193,30 +221,48 @@ if archivo != None:
                 if valorPred != "":
                     valoresPred = np.array(valorPred.split(","))
                     floatarray = []
-                    for i in range(len(encriptados)):
-                        floatarray.append(encriptados[i].transform([str(valoresPred[i])])[0])
+                    contador = 0
+
+                    for i in range(len(columnsX)):
+                        if not(columnsX[i] in columnasNum):
+                            floatarray.append(encriptados[contador].transform([str(valoresPred[i])])[0])
+                            contador = contador + 1
+                        else:
+                            floatarray.append(float(valoresPred[i]))
 
                     st.write("Valor de prediccion")
-                    st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
+                    print(floatarray)
+                    if not(columnY in columnasNum):
+                        st.write(leY.inverse_transform(arbol.predict([floatarray]))[0])
+                    else:
+                        st.write(arbol.predict([floatarray])[0])
 
         elif algoritmo == 'Redes Neuronales':
             columnas = list(df.columns)
             columnY = st.sidebar.selectbox(label="Seleccione la columna de salida", options=columnas)
             columnsX = st.multiselect("Escoja la columnas de entrada", options=columnas)
+            columnasNum = list(df.select_dtypes(["int","float","boolean"]).columns)
             
             if len(columnsX) != 0 and not(columnY in columnsX):
                 x = df[columnsX]
                 y = df[columnY]
 
                 x_trans = x.copy()
+                print(columnasNum)
                 encriptados = []
+
                 for columna in columnsX:
-                    leX = preprocessing.LabelEncoder()
-                    x_trans[columna] = leX.fit_transform(x_trans[columna])
-                    encriptados.append(leX)
+                    if columna in columnasNum:
+                        leX = preprocessing.LabelEncoder()
+                        x_trans[columna] = leX.fit_transform(x_trans[columna])
+                        encriptados.append(leX)
+                    else:
+                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
-                y = leY.fit_transform(y)
+                if not(columnY in columnasNum):
+                    y = leY.fit_transform(y)
+
                 neural = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
                 neural.fit(x_trans, y)
                 
@@ -225,14 +271,26 @@ if archivo != None:
                 if valorPred != "":
                     arreglo = valorPred.split("|")
                     matriz = []
+
                     for i in range(len(arreglo)):
                         fila = arreglo[i].split(",")
+                        contador = 0
                         filacod = []
-                        for j in range(len(fila)):
-                            filacod.append(encriptados[j].transform([fila[j]])[0])
+
+                        for j in range(len(columnsX)):
+                            if not(columnsX[j] in columnasNum):
+                                filacod.append(encriptados[contador].transform([str(fila[j])])[0])
+                                contador = contador + 1
+                            else:
+                                filacod.append(float(fila[j]))
                         matriz.append(filacod)
+
                     st.write("Valor de prediccion")
-                    st.write(leY.inverse_transform(neural.predict(matriz))[0])
+                    print(matriz)
+                    if not(columnY in columnasNum):
+                        st.write(leY.inverse_transform(neural.predict(matriz))[0])
+                    else:
+                        st.write(neural.predict(matriz)[0])
 
 
     except Exception as e:
