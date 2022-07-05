@@ -151,7 +151,7 @@ if archivo != None:
                 encriptados = []
 
                 for columna in columnsX:
-                    if columna in columnasNum:
+                    if not(columna in columnasNum):
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
@@ -200,7 +200,7 @@ if archivo != None:
                 encriptados = []
 
                 for columna in columnsX:
-                    if columna in columnasNum:
+                    if not(columna in columnasNum):
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
@@ -252,7 +252,7 @@ if archivo != None:
                 encriptados = []
 
                 for columna in columnsX:
-                    if columna in columnasNum:
+                    if not(columna in columnasNum):
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
