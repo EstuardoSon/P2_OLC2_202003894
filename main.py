@@ -116,7 +116,7 @@ if archivo != None:
                 monomios = [f"{coeficiente} * x^{i}" for i, coeficiente in enumerate(regresion.coef_)]
                 ecuacion = "$" +  " + ".join(monomios) + "$"
                 
-                cambio = {"x^0": "", "x^1": "x", '+ -': '- '}
+                cambio = {"* x^0": "", "x^1": "x", '+ -': '- '}
                 for actual, reemplazo in cambio.items():
                     ecuacion = ecuacion.replace(actual, reemplazo)
                 
