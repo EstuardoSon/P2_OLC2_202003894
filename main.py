@@ -49,8 +49,6 @@ if archivo != None:
                 st.subheader("Grafico de Regresion Lineal")
                 fig  = px.scatter(df, x = columnX, y=columnY, trendline="ols", trendline_color_override="green")
                 st.plotly_chart(fig)
-
-                operaciones = st.multiselect("Escoja las operaciones que desea ver", options=["Prediccion Y","Coeficiente de regresion","Intercepto","R^2","Error Cuadratico"])
                 
                 x = np.asarray(df[columnX]).reshape(-1, 1)
                 y = df[columnY]
@@ -58,6 +56,10 @@ if archivo != None:
                 regresion.fit(x,y)
                 prediccion_y = regresion.predict(x)
                 r2 = r2_score(y, prediccion_y)
+
+                st.write("Y = " + str(regresion.coef_[0])+" * X" + " + "+str(regresion.intercept_) )
+
+                operaciones = st.multiselect("Escoja las operaciones que desea ver", options=["Prediccion Y","Coeficiente de regresion","Intercepto","R^2","Error Cuadratico"])
 
                 if "Prediccion Y" in operaciones:
                     st.write("Predicciones de Y")
@@ -110,6 +112,15 @@ if archivo != None:
                 fig = px.scatter(df, x = columnX, y= columnY, opacity=0.65)
                 fig.add_traces(go.Scatter(x=Xrango.squeeze(), y=y_pred,name="grado: "+grado))
                 st.plotly_chart(fig)
+
+                monomios = [f"{coeficiente} * x^{i}" for i, coeficiente in enumerate(regresion.coef_)]
+                ecuacion = "$" +  " + ".join(monomios) + "$"
+                
+                cambio = {"x^0": "", "x^1": "x", '+ -': '- '}
+                for actual, reemplazo in cambio.items():
+                    ecuacion = ecuacion.replace(actual, reemplazo)
+                
+                st.write("Y = "+ecuacion)
 
                 operaciones = st.multiselect("Escoja las operaciones que desea ver", options=["R^2","RMSE"])
                 
