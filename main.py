@@ -166,8 +166,6 @@ if archivo != None:
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
-                    else:
-                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
                 if not(columnY in columnasNum):
@@ -215,8 +213,6 @@ if archivo != None:
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
-                    else:
-                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
                 if not(columnY in columnasNum):
@@ -267,8 +263,6 @@ if archivo != None:
                         leX = preprocessing.LabelEncoder()
                         x_trans[columna] = leX.fit_transform(x_trans[columna])
                         encriptados.append(leX)
-                    else:
-                        encriptados.append(x_trans[columna])
 
                 leY = preprocessing.LabelEncoder()
                 if not(columnY in columnasNum):
